@@ -1,5 +1,10 @@
-import com.cage.zxing4p3.*;
-ZXING4P zxing4p;
+import java.io.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.io.File;
+
+ArrayList<PImage> imagens = new ArrayList<PImage>();
+int numero = 1;
 
 // Classes
 Button[] button_1;
@@ -48,19 +53,6 @@ void setup() {
   button_3 = new Button[36];
   figura = new Figura [1];
 
-  // QRCode
-  zxing4p = new ZXING4P();
-  zxing4p.version();
-
-  String text = "https://mega.nz/folder/BIwjma5D#1gwhg3G2fTed2C8RI8BpZA/imagem_0001";
-
-  try {
-    QRCode = zxing4p.generateQRCode(text, width, height);
-  }
-  catch (Exception e) {
-    println("Exception: "+e);
-    QRCode = null;
-  }
 
   bg_1 = loadImage("bg_1.png");
   bg_2 = loadImage("bg_2.png");
@@ -177,14 +169,14 @@ void setup() {
 }
 
 void draw() {
-  background(200);
+  background(#ed665c);
   textAlign(CENTER);
   fill(0);
 
   switch(cena) {
   case 0:
     textSize(32);
-    text("Eu considero-me uma pessoa:", width/2, height/2-150);
+    text("Eu considero-me uma pessoa...", width/2, height/2-150);
     textSize(18);
     textAlign(RIGHT);
     text("Competitiva", 185, height/2 + 30);
@@ -199,7 +191,7 @@ void draw() {
 
   case 1:
     textSize(32);
-    text("Eu considero-me uma pessoa:", width/2, height/2-200);
+    text("Eu considero-me uma pessoa...", width/2, height/2-200);
     textSize(18);
     textAlign(RIGHT);
     text("Introvertida", 185, height/2 + 30);
@@ -214,7 +206,7 @@ void draw() {
 
   case 2:
     textSize(32);
-    text("Eu considero-me uma pessoa:", width/2, height/2-200);
+    text("Eu considero-me uma pessoa...", width/2, height/2-200);
     textSize(18);
     textAlign(RIGHT);
     text("Menos aberta a \nexperiências novas", 185, height/2 + 21);
@@ -231,12 +223,12 @@ void draw() {
 
   case 3:
     textSize(32);
-    text("Eu considero-me uma pessoa:", width/2, height/2-200);
+    text("Eu considero-me uma pessoa...", width/2, height/2-200);
     textSize(18);
     textAlign(RIGHT);
     text("Estável e calma", 185, height/2 + 30);
     textAlign(LEFT);
-    text("Frequentemente\npreocupada,\nfacilmente perturbada", width - 185, height/2 + 9);
+    text("Preocupada", width - 185, height/2 + 30);
     textAlign(CENTER);
 
     for (int i = 0; i < 5; i++) {
@@ -246,7 +238,7 @@ void draw() {
 
   case 4:
     textSize(32);
-    text("Eu considero-me uma pessoa:", width/2, height/2-200);
+    text("Eu considero-me uma pessoa...", width/2, height/2-200);
     textSize(18);
     textAlign(RIGHT);
     text("Arrumada \ne organizada", 185, height/2 + 21);
@@ -261,7 +253,7 @@ void draw() {
 
   case 5:
     textSize(32);
-    text("Escolha uma palavra que a descreva", width/2, height/2-200);
+    text("Eu sou uma pessoa...", width/2, height/2-200);
     textSize(18);
 
     for (int i = 0; i < 36; i++) {
@@ -274,14 +266,26 @@ void draw() {
     figura[0].desenha();
     if (saved == false) {
       saveImagemIncremental();
+      gerarQRCodeAsync();
       saved = true;
     }
     break;
 
-  case 7: // Download de brinde
-    if (QRCode!=null) {
-      image(QRCode, 0, 0);
+  case 7:
+    if (QRCode == null) {
+      carregarUltimoQRCode();
     }
+
+    background(255);
+    imageMode(CENTER);
+    if (QRCode != null) {
+      image(QRCode, width/2, height/2);
+    } else {
+      fill(0);
+      textAlign(CENTER);
+      text("QR Code a carregar...", width/2, height/2);
+    }
+    break;
   }
 }
 
@@ -332,6 +336,8 @@ void keyPressed() {
     }
   } else if (cena == 6) {
     if (keyCode == ENTER|| keyCode == ' ') {
+      QRCode = null; // reload do qrcode
+      qrCodeIndex++;
       cena = 7;
     }
   } else if (cena == 7) {

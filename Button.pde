@@ -14,8 +14,8 @@ class Button {
     fill(255);
     stroke(0);
     if (selecionado) {
-      strokeWeight(3);
-      stroke(255, 0, 0);
+      strokeWeight(5);
+      stroke(#0C4A8E);
     } else {
       strokeWeight(1);
     }
