@@ -3,8 +3,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.io.File;
 
-ArrayList<PImage> imagens = new ArrayList<PImage>();
-int numero = 1;
+//ArrayList<PImage> imagens = new ArrayList<PImage>();
+//int numero = 1;
 
 // Classes
 Button[] button_1;
@@ -45,14 +45,18 @@ PImage[] borda_image = new PImage[9];
 
 PImage QRCode;
 
+PImage capa;
+
 void setup() {
   size(1000, 1000);
+
 
   button_1 = new Button[9];
   button_2 = new Button[5];
   button_3 = new Button[36];
   figura = new Figura [1];
 
+  capa = loadImage("capa.png");
 
   bg_1 = loadImage("bg_1.png");
   bg_2 = loadImage("bg_2.png");
@@ -175,6 +179,15 @@ void draw() {
 
   switch(cena) {
   case 0:
+
+    println("Cena atual " + cena);
+    imageMode(CORNER);
+    image(capa, 0, 0);
+    break;
+
+  case 1:
+
+    println("Cena atual " + cena);
     textSize(32);
     text("Eu considero-me uma pessoa...", width/2, height/2-150);
     textSize(18);
@@ -189,7 +202,9 @@ void draw() {
     }
     break;
 
-  case 1:
+  case 2:
+
+    println("Cena atual " + cena);
     textSize(32);
     text("Eu considero-me uma pessoa...", width/2, height/2-200);
     textSize(18);
@@ -204,7 +219,9 @@ void draw() {
     }
     break;
 
-  case 2:
+  case 3:
+
+    println("Cena atual " + cena);
     textSize(32);
     text("Eu considero-me uma pessoa...", width/2, height/2-200);
     textSize(18);
@@ -221,7 +238,8 @@ void draw() {
     }
     break;
 
-  case 3:
+  case 4:
+    println("Cena atual " + cena);
     textSize(32);
     text("Eu considero-me uma pessoa...", width/2, height/2-200);
     textSize(18);
@@ -236,7 +254,8 @@ void draw() {
     }
     break;
 
-  case 4:
+  case 5:
+    println("Cena atual " + cena);
     textSize(32);
     text("Eu considero-me uma pessoa...", width/2, height/2-200);
     textSize(18);
@@ -251,7 +270,9 @@ void draw() {
     }
     break;
 
-  case 5:
+
+  case 6:
+    println("Cena atual " + cena);
     textSize(32);
     text("Eu sou uma pessoa...", width/2, height/2-200);
     textSize(18);
@@ -259,24 +280,41 @@ void draw() {
     for (int i = 0; i < 36; i++) {
       button_3[i].desenha(i == seleção);
     }
+
     break;
 
-
-  case 6:
+  case 7:
+    println("Cena atual " + cena);
     figura[0].desenha();
     if (saved == false) {
       saveImagemIncremental();
       gerarQRCodeAsync();
       saved = true;
     }
+    rectMode(CENTER);
+    noStroke();
+    fill(0, 50);
+    rect(width/2+5, 930, 650, 50, 10);
+    fill(240);
+    rect(width/2, 925, 650, 50, 10);
+    rectMode(CORNER);
+    textSize(24);
+    fill(0);
+    text("Pressione 'Avançar' para transferir a sua imagem.", width/2, 933);
     break;
 
-  case 7:
+  case 8:
+    println("Cena atual " + cena);
     if (QRCode == null) {
       carregarUltimoQRCode();
     }
 
     background(255);
+
+    textSize(24);
+    fill(0);
+    text("Pressione 'Avançar' para voltar a criar um brinde.", width/2, 933);
+
     imageMode(CENTER);
     if (QRCode != null) {
       image(QRCode, width/2, height/2);
@@ -291,57 +329,61 @@ void draw() {
 
 void keyPressed() {
   if (cena == 0) {
+    if (keyCode == ENTER || keyCode == ' ') {
+      cena = 1;
+    }
+  } else if (cena == 1) {
     if (keyCode == LEFT && seleção > 0) {
       seleção--;
     } else if (keyCode == RIGHT && seleção < 8) {
       seleção++;
-    } else if (keyCode == ENTER) {
+    } else if (keyCode == ENTER || keyCode == ' ') {
       animal = seleção + 1;
       seleção = 0;
-      cena = 1;
+      cena = 2;
     }
-  } else if (cena >= 1 && cena <= 4) {
+  } else if (cena >= 2 && cena <= 5) {
     if (keyCode == LEFT && seleção > 0) {
       seleção--;
     } else if (keyCode == RIGHT && seleção < 4) {
       seleção++;
-    } else if (keyCode == ENTER) {
+    } else if (keyCode == ENTER || keyCode == ' ') {
       switch(cena) {
-      case 1:
+      case 2:
         item = seleção + 1;
         break;
-      case 2:
+      case 3:
         barco = seleção + 1;
         break;
-      case 3:
+      case 4:
         bg = seleção + 1;
         break;
-      case 4:
+      case 5:
         mar = seleção + 1;
         break;
       }
       seleção = 0;
       cena++;
     }
-  } else if (cena == 5) {
+  } else if (cena == 6) {
     if (keyCode == LEFT && seleção > 0) {
       seleção--;
     } else if (keyCode == RIGHT && seleção < 35) {
       seleção++;
-    } else if (keyCode == ENTER|| keyCode == ' ') {
+    } else if (keyCode == ENTER || keyCode == ' ') {
       badge = seleção + 1;
       seleção = 0;
       figura[0] = new Figura (bg, animal, item, barco, mar, badge);
-      cena = 6;
-    }
-  } else if (cena == 6) {
-    if (keyCode == ENTER|| keyCode == ' ') {
-      QRCode = null; // reload do qrcode
-      qrCodeIndex++;
       cena = 7;
     }
   } else if (cena == 7) {
-    if (keyCode == ENTER|| keyCode == ' ') {
+    if (keyCode == ENTER || keyCode == ' ') {
+      QRCode = null; // reload do qrcode
+      qrCodeIndex++;
+      cena = 8;
+    }
+  } else if (cena == 8) {
+    if (keyCode == ENTER || keyCode == ' ') {
       saved = false;
       cena = 0;
     }
